@@ -6,6 +6,7 @@
 *.lo
 *.o
 *.obj
+*.pdb
 
 # Precompiled Headers
 *.gch
@@ -27,7 +28,16 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 /.vs
+
+
+#idk stuff ignore the fuck
+*.tlog
+.vs/
+*.idb
+*.log
+*.recipe
+*.vcxproj.user
+*.suo

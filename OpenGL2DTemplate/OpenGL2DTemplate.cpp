@@ -91,22 +91,22 @@ void drawHeart(float x, float y) {
 }
 
 void drawUpperBoundary() {
-	drawQuad(50, yCord - 50, 200, yCord - 100, 1.0f, 0.0f, 0.0f);
-	drawQuad(250, yCord - 50, 400, yCord - 100, 0.0f, 1.0f, 0.0f);
-	drawQuad(450, yCord - 50, 600, yCord - 100, 0.0f, 0.0f, 1.0f);
-	drawQuad(650, yCord - 50, 800, yCord - 100, 1.0f, 1.0f, 0.0f);
+	drawQuad(50, yCord - 50, 200, yCord - 70, 1.0f, 0.0f, 0.0f);
+	drawQuad(250, yCord - 50, 400, yCord - 70, 0.0f, 1.0f, 0.0f);
+	drawQuad(450, yCord - 50, 600, yCord - 70, 0.0f, 0.0f, 1.0f);
+	drawQuad(650, yCord - 50, 800, yCord - 70, 1.0f, 1.0f, 0.0f);
 }
 
 void drawLowerBoundary() {
-	drawQuad(50, 50, 200, 100, 1.0f, 0.5f, 0.0f);  
-	drawQuad(250, 50, 400, 100, 0.0f, 1.0f, 1.0f);
-	drawQuad(450, 50, 600, 100, 1.0f, 0.0f, 1.0f);
-	drawQuad(650, 50, 800, 100, 0.5f, 0.5f, 0.5f);
+	drawQuad(50, 50, 200, 70, 1.0f, 0.5f, 0.0f);  
+	drawQuad(250, 50, 400, 70, 0.0f, 1.0f, 1.0f);
+	drawQuad(450, 50, 600, 70, 1.0f, 0.0f, 1.0f);
+	drawQuad(650, 50, 800, 70, 0.5f, 0.5f, 0.5f);
 }
 
 void initializeHealth(int numHearts) {
 	float startX = 50.0f;  // Starting x position
-	float startY = yCord - 150.0f; // Adjust to be below the upper boundary
+	float startY = yCord - 100.0f; // Adjust to be below the upper boundary
 	glClearColor(1, 0, 0, 0.0f);
 	for (int i = 0; i < numHearts; i++) {
 		drawHeart(startX + (i * heartSpacing), startY);

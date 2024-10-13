@@ -5,11 +5,6 @@
 int xCord = 1000;
 int yCord = 500;
 
-double backRed = 0;
-double backGreen = 0;
-double backBlue = 0.5;
-
-
 void drawHeart(float x, float y) {
 	glBegin(GL_POLYGON);
 	for (float angle = 0; angle < 2 * 3.14159; angle += 0.1) {

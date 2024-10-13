@@ -12,6 +12,8 @@ int playerLife = 5;
 
 //transform manipulation
 float heartSpacing = 40.0f;
+int boundaryW1 = 50;
+int boundaryW2 = 70;
 
 void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 	glColor3f(r, g, b);
@@ -91,17 +93,17 @@ void drawHeart(float x, float y) {
 }
 
 void drawUpperBoundary() {
-	drawQuad(50, yCord - 50, 200, yCord - 70, 1.0f, 0.0f, 0.0f);
-	drawQuad(250, yCord - 50, 400, yCord - 70, 0.0f, 1.0f, 0.0f);
-	drawQuad(450, yCord - 50, 600, yCord - 70, 0.0f, 0.0f, 1.0f);
-	drawQuad(650, yCord - 50, 800, yCord - 70, 1.0f, 1.0f, 0.0f);
+	drawQuad(50, yCord - boundaryW1, 200, yCord - boundaryW2, 1.0f, 0.0f, 0.0f);
+	drawQuad(250, yCord - boundaryW1, 400, yCord - boundaryW2, 0.0f, 1.0f, 0.0f);
+	drawQuad(450, yCord - boundaryW1, 600, yCord - boundaryW2, 0.0f, 0.0f, 1.0f);
+	drawQuad(650, yCord - boundaryW1, 800, yCord - boundaryW2, 1.0f, 1.0f, 0.0f);
 }
 
 void drawLowerBoundary() {
-	drawQuad(50, 50, 200, 70, 1.0f, 0.5f, 0.0f);  
-	drawQuad(250, 50, 400, 70, 0.0f, 1.0f, 1.0f);
-	drawQuad(450, 50, 600, 70, 1.0f, 0.0f, 1.0f);
-	drawQuad(650, 50, 800, 70, 0.5f, 0.5f, 0.5f);
+	drawQuad(50, boundaryW1, 200, boundaryW2, 1.0f, 0.5f, 0.0f);
+	drawQuad(250, boundaryW1, 400, boundaryW2, 0.0f, 1.0f, 1.0f);
+	drawQuad(450, boundaryW1, 600, boundaryW2, 1.0f, 0.0f, 1.0f);
+	drawQuad(650, boundaryW1, 800, boundaryW2, 0.5f, 0.5f, 0.5f);
 }
 
 void initializeHealth(int numHearts) {
@@ -118,8 +120,6 @@ void Display() {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	drawUpperBoundary();
-
-	// Draw lower boundary
 	drawLowerBoundary();
 	initializeHealth(playerLife);
 

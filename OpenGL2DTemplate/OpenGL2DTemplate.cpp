@@ -9,7 +9,80 @@ int yCord = 500;
 //player information
 int playerLife = 5;
 
+
+//transform manipulation
+float heartSpacing = 40.0f;
+
+void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
+	glColor3f(r, g, b);
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < 360; i++) {
+		float theta = i * (3.14159 / 180.0f);
+		float x = radius * cos(theta);
+		float y = radius * sin(theta);
+		glVertex2f(cx + x, cy + y);
+	}
+	glEnd();
+}
+
+void drawPlayer(float x, float y) {
+	// Draw player's head (circle)
+	drawCircle(x, y + 50, 20, 1.0f, 0.8f, 0.6f); // Head
+
+	// Draw player's body (quad)
+	glColor3f(0.0f, 0.0f, 1.0f); // Blue body
+	glBegin(GL_QUADS);
+	glVertex2f(x - 20, y + 30);
+	glVertex2f(x + 20, y + 30);
+	glVertex2f(x + 20, y - 20);
+	glVertex2f(x - 20, y - 20);
+	glEnd();
+
+	// Draw player's left arm (triangle)
+	glColor3f(1.0f, 0.0f, 0.0f); // Red arms
+	glBegin(GL_TRIANGLES);
+	glVertex2f(x - 20, y + 20);
+	glVertex2f(x - 40, y);
+	glVertex2f(x - 20, y - 10);
+	glEnd();
+
+	// Draw player's right arm (triangle)
+	glBegin(GL_TRIANGLES);
+	glVertex2f(x + 20, y + 20);
+	glVertex2f(x + 40, y);
+	glVertex2f(x + 20, y - 10);
+	glEnd();
+
+	// Draw player's legs (quad for simplicity)
+	glColor3f(0.0f, 1.0f, 0.0f); // Green legs
+	glBegin(GL_QUADS);
+	glVertex2f(x - 15, y - 20);
+	glVertex2f(x - 5, y - 20);
+	glVertex2f(x - 5, y - 40);
+	glVertex2f(x - 15, y - 40);
+
+	glVertex2f(x + 5, y - 20);
+	glVertex2f(x + 15, y - 20);
+	glVertex2f(x + 15, y - 40);
+	glVertex2f(x + 5, y - 40);
+	glEnd();
+}
+
+void drawQuad(float x1, float y1, float x2, float y2, float r, float g, float b) {
+	// Set the color for the quad
+	glColor3f(r, g, b);
+
+	// Draw the quad
+	glBegin(GL_QUADS);
+	glVertex2f(x1, y1);
+	glVertex2f(x2, y1);
+	glVertex2f(x2, y2);
+	glVertex2f(x1, y2);
+	glEnd();
+}
+
 void drawHeart(float x, float y) {
+	glColor3f(1.0f, 0.0f, 0.0f);//red hearts
 	glBegin(GL_POLYGON);
 	for (float angle = 0; angle < 2 * 3.14159; angle += 0.1) {
 		float dx =  16 * sin(angle) * sin(angle) * sin(angle);
@@ -19,20 +92,42 @@ void drawHeart(float x, float y) {
 	glEnd();
 }
 
-void initializeHealth(int numHearts) {
-	float startX = 20.0f; 
-	float startY = 40.0f;
+void drawUpperBoundary() {
+	// Drawing 4 quads for the upper boundary in pixel coordinates
+	drawQuad(50, yCord - 50, 200, yCord - 100, 1.0f, 0.0f, 0.0f);  // Quad 1
+	drawQuad(250, yCord - 50, 400, yCord - 100, 0.0f, 1.0f, 0.0f); // Quad 2
+	drawQuad(450, yCord - 50, 600, yCord - 100, 0.0f, 0.0f, 1.0f); // Quad 3
+	drawQuad(650, yCord - 50, 800, yCord - 100, 1.0f, 1.0f, 0.0f); // Quad 4
+}
 
+void drawLowerBoundary() {
+	// Drawing 4 quads for the lower boundary in pixel coordinates
+	drawQuad(50, 50, 200, 100, 1.0f, 0.5f, 0.0f);  // Quad 1
+	drawQuad(250, 50, 400, 100, 0.0f, 1.0f, 1.0f); // Quad 2
+	drawQuad(450, 50, 600, 100, 1.0f, 0.0f, 1.0f); // Quad 3
+	drawQuad(650, 50, 800, 100, 0.5f, 0.5f, 0.5f); // Quad 4
+}
+
+void initializeHealth(int numHearts) {
+	float startX = 50.0f;  // Starting x position
+	float startY = yCord - 150.0f; // Adjust to be below the upper boundary
+	glClearColor(1, 0, 0, 0.0f);
 	for (int i = 0; i < numHearts; i++) {
-		drawHeart(startX + (i * 40.0f), startY);
+		drawHeart(startX + (i * heartSpacing), startY);
 	}
 }
 
 void Display() {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);//bg color
 
+	glClear(GL_COLOR_BUFFER_BIT);
+	drawUpperBoundary();
+
+	// Draw lower boundary
+	drawLowerBoundary();
 	initializeHealth(playerLife);
 
+	drawPlayer(500, 250);
 	glFlush();
 }
 
@@ -47,7 +142,6 @@ void main(int argc, char** argr) {
 	glutDisplayFunc(Display);
 
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	gluOrtho2D(0.0, xCord, 0.0, yCord);
 
 	glutMainLoop();

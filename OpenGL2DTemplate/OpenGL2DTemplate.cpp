@@ -2,8 +2,12 @@
 #include <glut.h>
 #include <math.h>	
 
+//sizes of the screen
 int xCord = 1000;
 int yCord = 500;
+
+//player information
+int playerLife = 5;
 
 void drawHeart(float x, float y) {
 	glBegin(GL_POLYGON);
@@ -27,7 +31,7 @@ void initializeHealth(int numHearts) {
 void Display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	initializeHealth(5);
+	initializeHealth(playerLife);
 
 	glFlush();
 }

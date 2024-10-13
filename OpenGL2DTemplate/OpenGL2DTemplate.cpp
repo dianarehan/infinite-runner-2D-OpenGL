@@ -69,10 +69,8 @@ void drawPlayer(float x, float y) {
 }
 
 void drawQuad(float x1, float y1, float x2, float y2, float r, float g, float b) {
-	// Set the color for the quad
 	glColor3f(r, g, b);
 
-	// Draw the quad
 	glBegin(GL_QUADS);
 	glVertex2f(x1, y1);
 	glVertex2f(x2, y1);
@@ -93,19 +91,17 @@ void drawHeart(float x, float y) {
 }
 
 void drawUpperBoundary() {
-	// Drawing 4 quads for the upper boundary in pixel coordinates
-	drawQuad(50, yCord - 50, 200, yCord - 100, 1.0f, 0.0f, 0.0f);  // Quad 1
-	drawQuad(250, yCord - 50, 400, yCord - 100, 0.0f, 1.0f, 0.0f); // Quad 2
-	drawQuad(450, yCord - 50, 600, yCord - 100, 0.0f, 0.0f, 1.0f); // Quad 3
-	drawQuad(650, yCord - 50, 800, yCord - 100, 1.0f, 1.0f, 0.0f); // Quad 4
+	drawQuad(50, yCord - 50, 200, yCord - 100, 1.0f, 0.0f, 0.0f);
+	drawQuad(250, yCord - 50, 400, yCord - 100, 0.0f, 1.0f, 0.0f);
+	drawQuad(450, yCord - 50, 600, yCord - 100, 0.0f, 0.0f, 1.0f);
+	drawQuad(650, yCord - 50, 800, yCord - 100, 1.0f, 1.0f, 0.0f);
 }
 
 void drawLowerBoundary() {
-	// Drawing 4 quads for the lower boundary in pixel coordinates
-	drawQuad(50, 50, 200, 100, 1.0f, 0.5f, 0.0f);  // Quad 1
-	drawQuad(250, 50, 400, 100, 0.0f, 1.0f, 1.0f); // Quad 2
-	drawQuad(450, 50, 600, 100, 1.0f, 0.0f, 1.0f); // Quad 3
-	drawQuad(650, 50, 800, 100, 0.5f, 0.5f, 0.5f); // Quad 4
+	drawQuad(50, 50, 200, 100, 1.0f, 0.5f, 0.0f);  
+	drawQuad(250, 50, 400, 100, 0.0f, 1.0f, 1.0f);
+	drawQuad(450, 50, 600, 100, 1.0f, 0.0f, 1.0f);
+	drawQuad(650, 50, 800, 100, 0.5f, 0.5f, 0.5f);
 }
 
 void initializeHealth(int numHearts) {

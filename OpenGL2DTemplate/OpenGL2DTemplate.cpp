@@ -55,6 +55,12 @@ const float obstacleColorB = 0.616f;
 
 //game data
 bool isGameOver = false;
+bool isTimeUp = false;
+
+// Timer variables
+int timer = 60;
+int timerFrameCount = 0; // Frame count to update the timer every second
+const int framesPerSecond = 60;
 
 void drawStar(float x, float y, float size) {
 	glBegin(GL_TRIANGLES);
@@ -134,6 +140,26 @@ void renderGameOver() {
 	}
 }
 
+void renderTimer() {
+	glColor3f(1.0f, 1.0f, 1.0f); // White color for the timer
+	glRasterPos2f(900, upperHeight); // Position below the score
+	std::string timerText = "Time: " + std::to_string(timer);
+	const char* timerCStr = timerText.c_str();
+	for (const char* c = timerCStr; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+	}
+}
+
+void renderGameEnd() {
+	glColor3f(0.1137f, 0.6118f, 0.0980f);
+	glRasterPos2f(xCord / 2 - 50, yCord / 2);
+	char message[50];
+	sprintf(message, "Game End,\n\n with a score of %d", playerScore);
+	for (char* c = message; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+	}
+}
+
 void renderScore() {
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the score
 	glRasterPos2f(450, upperHeight);
@@ -184,7 +210,19 @@ void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 
 void updatePlayer() {
 	if (isGameOver) return;
-	
+
+	timerFrameCount++;
+	if (timerFrameCount >= framesPerSecond) {
+		timer--;
+		timerFrameCount = 0;
+	}
+
+	if (timer <= 0) {
+		isTimeUp = true;
+		glutPostRedisplay();
+		return;
+	}
+
 	if (isJumping) {
 		playerY += jumpVelocity;
 		currentJumpHeight += jumpVelocity;
@@ -349,7 +387,9 @@ void Display() {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (isGameOver) renderGameOver();	
+	if (isTimeUp) renderGameEnd();
+	
+	else if (isGameOver) renderGameOver();
 	
 	else {
 		drawUpperBoundary();
@@ -359,6 +399,7 @@ void Display() {
 		drawCollectible();
 		drawPlayer(playerX, playerY);
 		renderScore();
+		renderTimer();
 	}
 	glFlush();
 }

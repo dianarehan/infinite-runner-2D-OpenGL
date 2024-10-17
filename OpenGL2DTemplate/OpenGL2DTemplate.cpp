@@ -425,13 +425,29 @@ void drawLowerBoundary() {
 }
 
 void initializeHealth(int numHearts) {
-	float startX = 30.0f;  // Starting x position
-	float startY = yCord - 70.0f; // Adjust to be below the upper boundary
-	glClearColor(1, 0, 0, 0.0f);
+	float startX = 40.0f;  // Starting x position
+	float startY = yCord - 100.0f; // Adjust to be below the upper boundary
+	float heartWidth = 16.0f; // Width of each heart
+	float heartHeight = 13.0f; // Height of each heart
+	float frameWidth = numHearts * heartSpacing;
+	float frameHeight = heartHeight * 2; // Adjust as needed for the height of the hearts
+
+	// Draw white frame
+	glColor3f(1.0f, 1.0f, 1.0f); // White color
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(startX - 10, startY - 10);
+	glVertex2f(startX + frameWidth + 10, startY - 10);
+	glVertex2f(startX + frameWidth + 10, startY + frameHeight + 10);
+	glVertex2f(startX - 10, startY + frameHeight + 10);
+	glEnd();
+
+	// Draw hearts
 	for (int i = 0; i < numHearts; i++) {
-		drawHeart(startX + (i * heartSpacing), startY);
+		drawHeart(startX+10 + (i * heartSpacing), startY+20);
 	}
 }
+
+
 
 void Display() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);//bg color

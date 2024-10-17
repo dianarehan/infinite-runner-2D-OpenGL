@@ -42,7 +42,7 @@ float obstacleHeight = 30.0f;
 
 //collectibles properties
 float collectibleX = xCord;
-float collectibleY = 270.0f;
+float collectibleY = playerHeight+jumpHeight;
 float collectibleWidth = 20.0f;
 float collectibleHeight = 20.0f;
 bool isCollectibleActive = true;
@@ -149,7 +149,7 @@ void updateObstacle() {
 
 	if (obstacleX + obstacleWidth < 0) {
 		obstacleX = xCord;
-		obstacleY = 70.0f + (rand() % 2) * playerHeight;
+		obstacleY = 70.0f + (rand() % 2) * 60;
 	}
 }
 

@@ -62,6 +62,10 @@ int timer = 60;
 int timerFrameCount = 0; // Frame count to update the timer every second
 const int framesPerSecond = 60;
 
+//game speed modifier
+float speedMultiplier = 1.0f;
+const float speedIncreaseRate = 0.06f;
+
 void drawStar(float x, float y, float size) {
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < 5; ++i) {
@@ -90,7 +94,7 @@ void drawCollectible() {
 
 void updateCollectible() {
 	if (isCollectibleActive) {
-		collectibleX -= 5.0f; // Move collectible to the left
+		collectibleX -= 5.0f * speedMultiplier; // Move collectible to the left
 
 		if (collectibleX + collectibleWidth < 0) {
 			collectibleX = xCord;
@@ -172,7 +176,7 @@ void renderScore() {
 }
 
 void updateObstacle() {
-	obstacleX -= 5.0f; // Move obstacle to the left
+	obstacleX -= 5.0f  *speedMultiplier; // Move obstacle to the left
 
 	if (obstacleX + obstacleWidth < 0) {
 		obstacleX = xCord;
@@ -210,12 +214,13 @@ void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 }
 
 void updatePlayer() {
-	if (isGameOver) return;
+	if (isGameOver || isTimeUp) return;
 
 	timerFrameCount++;
 	if (timerFrameCount >= framesPerSecond) {
 		timer--;
 		timerFrameCount = 0;
+		speedMultiplier += speedIncreaseRate;
 	}
 
 	if (timer <= 0) {

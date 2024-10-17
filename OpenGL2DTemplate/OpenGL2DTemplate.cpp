@@ -133,9 +133,10 @@ bool checkCollision() {
 
 void renderGameOver() {
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glRasterPos2f(xCord / 2 - 50, yCord / 2);
-	const char* message = "Game Lose";
-	for (const char* c = message; *c != '\0'; c++) {
+	glRasterPos2f(xCord / 2 - 100, yCord / 2);
+	char message[50];
+	sprintf(message, "Game Lose,\n\n with a score of %d", playerScore);
+	for (char* c = message; *c != '\0'; c++) {
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
 	}
 }
@@ -152,7 +153,7 @@ void renderTimer() {
 
 void renderGameEnd() {
 	glColor3f(0.1137f, 0.6118f, 0.0980f);
-	glRasterPos2f(xCord / 2 - 50, yCord / 2);
+	glRasterPos2f(xCord / 2 - 100, yCord / 2);
 	char message[50];
 	sprintf(message, "Game End,\n\n with a score of %d", playerScore);
 	for (char* c = message; *c != '\0'; c++) {

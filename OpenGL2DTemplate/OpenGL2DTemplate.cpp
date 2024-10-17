@@ -28,6 +28,44 @@ float heartSpacing = 40.0f;
 int boundaryW1 = 20;
 int boundaryW2 = 40;
 
+// Obstacle properties
+float obstacleX = xCord;
+float obstacleY = 70.0f;
+float obstacleWidth = 30.0f;
+float obstacleHeight = 30.0f;
+
+// Color for obstacles
+const float obstacleColorR = 0.196f;
+const float obstacleColorG = 0.659f;
+const float obstacleColorB = 0.616f;
+
+
+void updateObstacle() {
+	obstacleX -= 5.0f; // Move obstacle to the left
+
+	if (obstacleX + obstacleWidth < 0) {
+		obstacleX = xCord;
+		obstacleY = 70.0f + (rand() % 2) * playerHeight;
+	}
+}
+
+void drawObstacle() {
+	glColor3f(obstacleColorR, obstacleColorG, obstacleColorB);
+
+	glBegin(GL_QUADS);
+	glVertex2f(obstacleX, obstacleY);
+	glVertex2f(obstacleX + obstacleWidth, obstacleY);
+	glVertex2f(obstacleX + obstacleWidth, obstacleY + obstacleHeight);
+	glVertex2f(obstacleX, obstacleY + obstacleHeight);
+	glEnd();
+
+	glBegin(GL_TRIANGLES);
+	glVertex2f(obstacleX, obstacleY + obstacleHeight);
+	glVertex2f(obstacleX + obstacleWidth / 2, obstacleY + obstacleHeight + 20.0f);
+	glVertex2f(obstacleX + obstacleWidth, obstacleY + obstacleHeight);
+	glEnd();
+}
+
 void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 	glColor3f(r, g, b);
 	glBegin(GL_POLYGON);
@@ -59,6 +97,7 @@ void updatePlayer() {
 	else {
 		playerHeight = 60;
 	}
+	updateObstacle();
 	glutPostRedisplay();
 }
 
@@ -177,7 +216,7 @@ void Display() {
 	drawUpperBoundary();
 	drawLowerBoundary();
 	initializeHealth(playerLife);
-
+	drawObstacle();
 	drawPlayer(playerX, playerY);
 	glFlush();
 }

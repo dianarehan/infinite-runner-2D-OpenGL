@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <glut.h>
 #include <math.h>	
+#include<string>
 
 //sizes of the screen
 int xCord = 1000;
@@ -13,6 +14,7 @@ bool isDucking = false;
 bool isVulnerable = false;
 int vulnerableTimer = 0;
 const int maxVulnerableTime = 30;
+int playerScore = 0;
 
 //player position and movement
 float playerX = 100.0f;
@@ -31,11 +33,18 @@ float heartSpacing = 40.0f;
 int boundaryW1 = 20;
 int boundaryW2 = 40;
 
-// Obstacle properties
+//obstacle properties
 float obstacleX = xCord;
 float obstacleY = 70.0f;
 float obstacleWidth = 30.0f;
 float obstacleHeight = 30.0f;
+
+//collectibles properties
+float collectibleX = xCord;
+float collectibleY = 150.0f;
+float collectibleWidth = 20.0f;
+float collectibleHeight = 20.0f;
+bool isCollectibleActive = true;
 
 // Colors
 const float obstacleColorR = 0.196f;
@@ -44,6 +53,43 @@ const float obstacleColorB = 0.616f;
 
 //game data
 bool isGameOver = false;
+
+void drawCollectible() {
+	if (isCollectibleActive) {
+		glColor3f(1.0f, 1.0f, 0.0f); // Yellow color for the collectible
+		glBegin(GL_QUADS);
+		glVertex2f(collectibleX, collectibleY);
+		glVertex2f(collectibleX + collectibleWidth, collectibleY);
+		glVertex2f(collectibleX + collectibleWidth, collectibleY + collectibleHeight);
+		glVertex2f(collectibleX, collectibleY + collectibleHeight);
+		glEnd();
+	}
+}
+
+void updateCollectible() {
+	if (isCollectibleActive) {
+		collectibleX -= 5.0f; // Move collectible to the left
+
+		if (collectibleX + collectibleWidth < 0) {
+			collectibleX = xCord;
+			collectibleY = 70.0f + (rand() % 2) * playerHeight;
+		}
+	}
+}
+
+bool checkCollectibleCollision() {
+	float playerLeft = playerX - playerWidth / 2;
+	float playerRight = playerX + playerWidth / 2;
+	float playerTop = playerY + playerHeight;
+	float playerBottom = playerY;
+
+	float collectibleLeft = collectibleX;
+	float collectibleRight = collectibleX + collectibleWidth;
+	float collectibleTop = collectibleY + collectibleHeight;
+	float collectibleBottom = collectibleY;
+
+	return !(playerLeft > collectibleRight || playerRight < collectibleLeft || playerTop < collectibleBottom || playerBottom > collectibleTop);
+}
 
 bool checkCollision() {
 	float playerLeft = playerX - playerWidth / 2;
@@ -68,6 +114,15 @@ void renderGameOver() {
 	}
 }
 
+void renderScore() {
+	glColor3f(1.0f, 1.0f, 1.0f); // White color for the score
+	glRasterPos2f(10, yCord - 30); // Position at the top-left corner
+	std::string scoreText = "Score: " + std::to_string(playerScore);
+	const char* scoreCStr = scoreText.c_str();
+	for (const char* c = scoreCStr; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+	}
+}
 void updateObstacle() {
 	obstacleX -= 5.0f; // Move obstacle to the left
 
@@ -129,6 +184,7 @@ void updatePlayer() {
 	}
 
 	updateObstacle();
+	updateCollectible();
 
 	if (!isVulnerable && checkCollision()) {
 		playerLife--;
@@ -137,6 +193,15 @@ void updatePlayer() {
 		isVulnerable = true;
 		vulnerableTimer = maxVulnerableTime;
 		obstacleX += 200.0f; // Move obstacle further to the right
+	}
+
+	if (checkCollectibleCollision()) {
+		isCollectibleActive = false;
+		playerScore ++;
+		// Reset collectible position
+		collectibleX = xCord;
+		collectibleY = 70.0f + (rand() % 2) * playerHeight;
+		isCollectibleActive = true;
 	}
 
 	// Handle vulnerable state
@@ -270,7 +335,9 @@ void Display() {
 		drawLowerBoundary();
 		initializeHealth(playerLife);
 		drawObstacle();
+		drawCollectible();
 		drawPlayer(playerX, playerY);
+		renderScore();
 	}
 	glFlush();
 }

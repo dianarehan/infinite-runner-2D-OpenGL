@@ -45,6 +45,7 @@ float collectibleY = 150.0f;
 float collectibleWidth = 20.0f;
 float collectibleHeight = 20.0f;
 bool isCollectibleActive = true;
+float starRotationAngle = 0.0f;
 
 // Colors
 const float obstacleColorR = 0.196f;
@@ -54,15 +55,29 @@ const float obstacleColorB = 0.616f;
 //game data
 bool isGameOver = false;
 
+void drawStar(float x, float y, float size) {
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < 5; ++i) {
+		float angle1 = i * 2.0f * 3.14159f / 5.0f;
+		float angle2 = (i + 2) * 2.0f * 3.14159f / 5.0f;
+		glVertex2f(x, y);
+		glVertex2f(x + size * cos(angle1), y + size * sin(angle1));
+		glVertex2f(x + size * cos(angle2), y + size * sin(angle2));
+	}
+	glEnd();
+}
+
 void drawCollectible() {
 	if (isCollectibleActive) {
-		glColor3f(1.0f, 1.0f, 0.0f); // Yellow color for the collectible
-		glBegin(GL_QUADS);
-		glVertex2f(collectibleX, collectibleY);
-		glVertex2f(collectibleX + collectibleWidth, collectibleY);
-		glVertex2f(collectibleX + collectibleWidth, collectibleY + collectibleHeight);
-		glVertex2f(collectibleX, collectibleY + collectibleHeight);
-		glEnd();
+		glPushMatrix();
+		glTranslatef(collectibleX + collectibleWidth / 2, collectibleY + collectibleHeight / 2, 0.0f);
+		glRotatef(starRotationAngle, 0.0f, 0.0f, 1.0f);
+		glTranslatef(-(collectibleX + collectibleWidth / 2), -(collectibleY + collectibleHeight / 2), 0.0f);
+
+		glColor3f(1.0f, 1.0f, 0.0f); // Yellow color for the star
+		drawStar(collectibleX + collectibleWidth / 2, collectibleY + collectibleHeight / 2, collectibleWidth / 2);
+
+		glPopMatrix();
 	}
 }
 
@@ -73,6 +88,10 @@ void updateCollectible() {
 		if (collectibleX + collectibleWidth < 0) {
 			collectibleX = xCord;
 			collectibleY = 70.0f + (rand() % 2) * playerHeight;
+		}
+		starRotationAngle += 2.0f;
+		if (starRotationAngle >= 360.0f) {
+			starRotationAngle -= 360.0f;
 		}
 	}
 }
@@ -116,7 +135,7 @@ void renderGameOver() {
 
 void renderScore() {
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the score
-	glRasterPos2f(10, yCord - 30); // Position at the top-left corner
+	glRasterPos2f(10, yCord - 30);
 	std::string scoreText = "Score: " + std::to_string(playerScore);
 	const char* scoreCStr = scoreText.c_str();
 	for (const char* c = scoreCStr; *c != '\0'; c++) {

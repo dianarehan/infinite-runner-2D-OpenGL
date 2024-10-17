@@ -12,8 +12,8 @@ int playerLife = 5;
 
 //transform manipulation
 float heartSpacing = 40.0f;
-int boundaryW1 = 50;
-int boundaryW2 = 70;
+int boundaryW1 = 20;
+int boundaryW2 = 40;
 
 void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 	glColor3f(r, g, b);
@@ -93,22 +93,22 @@ void drawHeart(float x, float y) {
 }
 
 void drawUpperBoundary() {
-	drawQuad(50, yCord - boundaryW1, 200, yCord - boundaryW2, 1.0f, 0.0f, 0.0f);
-	drawQuad(250, yCord - boundaryW1, 400, yCord - boundaryW2, 0.0f, 1.0f, 0.0f);
-	drawQuad(450, yCord - boundaryW1, 600, yCord - boundaryW2, 0.0f, 0.0f, 1.0f);
-	drawQuad(650, yCord - boundaryW1, 800, yCord - boundaryW2, 1.0f, 1.0f, 0.0f);
+	drawQuad(0, yCord - boundaryW1, 250, yCord - boundaryW2, 1.0f, 0.0f, 0.0f);
+	drawQuad(250, yCord - boundaryW1, 500, yCord - boundaryW2, 0.0f, 1.0f, 0.0f);
+	drawQuad(500, yCord - boundaryW1, 750, yCord - boundaryW2, 0.0f, 0.0f, 1.0f);
+	drawQuad(750, yCord - boundaryW1, 1000, yCord - boundaryW2, 1.0f, 1.0f, 0.0f);
 }
 
 void drawLowerBoundary() {
-	drawQuad(50, boundaryW1, 200, boundaryW2, 1.0f, 0.5f, 0.0f);
-	drawQuad(250, boundaryW1, 400, boundaryW2, 0.0f, 1.0f, 1.0f);
-	drawQuad(450, boundaryW1, 600, boundaryW2, 1.0f, 0.0f, 1.0f);
-	drawQuad(650, boundaryW1, 800, boundaryW2, 0.5f, 0.5f, 0.5f);
+	drawQuad(0, boundaryW1, 250, boundaryW2, 1.0f, 0.5f, 0.0f);
+	drawQuad(250, boundaryW1, 500, boundaryW2, 0.0f, 1.0f, 1.0f);
+	drawQuad(500, boundaryW1, 750, boundaryW2, 1.0f, 0.0f, 1.0f);
+	drawQuad(750, boundaryW1, 1000, boundaryW2, 0.5f, 0.5f, 0.5f);
 }
 
 void initializeHealth(int numHearts) {
-	float startX = 50.0f;  // Starting x position
-	float startY = yCord - 100.0f; // Adjust to be below the upper boundary
+	float startX = 30.0f;  // Starting x position
+	float startY = yCord - 70.0f; // Adjust to be below the upper boundary
 	glClearColor(1, 0, 0, 0.0f);
 	for (int i = 0; i < numHearts; i++) {
 		drawHeart(startX + (i * heartSpacing), startY);
@@ -123,7 +123,7 @@ void Display() {
 	drawLowerBoundary();
 	initializeHealth(playerLife);
 
-	drawPlayer(500, 250);
+	drawPlayer(100, 70);
 	glFlush();
 }
 

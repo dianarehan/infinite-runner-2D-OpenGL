@@ -20,8 +20,8 @@ int playerScore = 0;
 float playerX = 100.0f;
 float playerY = 70.0f;
 float jumpHeight = 180.0f;
-float gravity = 10.0f;
-float jumpVelocity = 15.0f;
+float gravity = 8.0f;
+float jumpVelocity = 16.0f;
 float currentJumpHeight = 0.0f;
 
 //player boundaries
@@ -162,7 +162,7 @@ void drawObstacle() {
 	glVertex2f(obstacleX + obstacleWidth, obstacleY + obstacleHeight);
 	glVertex2f(obstacleX, obstacleY + obstacleHeight);
 	glEnd();
-
+	glColor3f(0x49 / 255.0f, 0x91 / 255.0f, 0x8d / 255.0f);
 	glBegin(GL_TRIANGLES);
 	glVertex2f(obstacleX, obstacleY + obstacleHeight);
 	glVertex2f(obstacleX + obstacleWidth / 2, obstacleY + obstacleHeight + 20.0f);

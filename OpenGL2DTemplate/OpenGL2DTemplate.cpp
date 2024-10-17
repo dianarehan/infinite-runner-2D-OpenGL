@@ -32,6 +32,7 @@ int playerHeight = 60;
 float heartSpacing = 40.0f;
 int boundaryW1 = 20;
 int boundaryW2 = 40;
+int upperHeight = yCord - 70;
 
 //obstacle properties
 float obstacleX = xCord;
@@ -135,13 +136,14 @@ void renderGameOver() {
 
 void renderScore() {
 	glColor3f(1.0f, 1.0f, 1.0f); // White color for the score
-	glRasterPos2f(10, yCord - 30);
+	glRasterPos2f(450, upperHeight);
 	std::string scoreText = "Score: " + std::to_string(playerScore);
 	const char* scoreCStr = scoreText.c_str();
 	for (const char* c = scoreCStr; *c != '\0'; c++) {
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
 	}
 }
+
 void updateObstacle() {
 	obstacleX -= 5.0f; // Move obstacle to the left
 

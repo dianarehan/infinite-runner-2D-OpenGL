@@ -13,15 +13,15 @@ bool isJumping = false;
 bool isDucking = false;
 bool isVulnerable = false;
 int vulnerableTimer = 0;
-const int maxVulnerableTime = 30;
+const int maxVulnerableTime = 10;
 int playerScore = 0;
 
 //player position and movement
 float playerX = 100.0f;
 float playerY = 70.0f;
-float jumpHeight = 150.0f;
-float gravity = 5.0f;
-float jumpVelocity = 10.0f;
+float jumpHeight = 180.0f;
+float gravity = 10.0f;
+float jumpVelocity = 15.0f;
 float currentJumpHeight = 0.0f;
 
 //player boundaries
@@ -200,7 +200,7 @@ void updatePlayer() {
 		playerScore ++;
 		// Reset collectible position
 		collectibleX = xCord;
-		collectibleY = 70.0f + (rand() % 2) * playerHeight;
+		collectibleY = 70.0f + (rand() % 2) * 60;
 		isCollectibleActive = true;
 	}
 

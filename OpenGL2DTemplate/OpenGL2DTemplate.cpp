@@ -8,7 +8,20 @@ int yCord = 500;
 
 //player information
 int playerLife = 5;
+bool isJumping = false;
+bool isDucking = false;
 
+//player position and movement
+float playerX = 100.0f;
+float playerY = 70.0f;
+float jumpHeight = 150.0f;
+float gravity = 9.0f;
+float jumpVelocity = 10.0f;
+float currentJumpHeight = 0.0f;
+
+//player boundaries
+int playerWidth = 40;
+int playerHeight = 60; 
 
 //transform manipulation
 float heartSpacing = 40.0f;
@@ -25,6 +38,48 @@ void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 		glVertex2f(cx + x, cy + y);
 	}
 	glEnd();
+}
+
+void updatePlayer() {
+	if (isJumping) {
+		playerY += jumpVelocity;
+		currentJumpHeight += jumpVelocity;
+		if (currentJumpHeight >= jumpHeight) {
+			isJumping = false;
+		}
+	}
+	else if (playerY > 70.0f) {
+		playerY -= gravity;
+		currentJumpHeight -= gravity;
+	}
+
+	if (isDucking) {
+		playerHeight = 40;
+	}
+	else {
+		playerHeight = 60;
+	}
+	glutPostRedisplay();
+}
+
+void keyDown(unsigned char key, int x, int y) {
+	switch (key) {
+	case ' ':
+		if (playerY == 70.0f) {
+			isJumping = true;
+			currentJumpHeight = 0;
+		}
+		break;
+	case 's':
+		isDucking = true;
+		break;
+	}
+}
+
+void keyUp(unsigned char key, int x, int y) {
+	if (key == 's') {
+		isDucking = false;
+	}
 }
 
 void drawPlayer(float x, float y) {
@@ -123,10 +178,14 @@ void Display() {
 	drawLowerBoundary();
 	initializeHealth(playerLife);
 
-	drawPlayer(100, 70);
+	drawPlayer(playerX, playerY);
 	glFlush();
 }
 
+void Timer(int value) {
+	updatePlayer();
+	glutTimerFunc(16, Timer, 0);
+}
 
 void main(int argc, char** argr) {
 	glutInit(&argc, argr);
@@ -136,7 +195,9 @@ void main(int argc, char** argr) {
 
 	glutCreateWindow("Game");
 	glutDisplayFunc(Display);
-
+	glutKeyboardFunc(keyDown);
+	glutKeyboardUpFunc(keyUp);
+	glutTimerFunc(0, Timer, 0);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	gluOrtho2D(0.0, xCord, 0.0, yCord);
 

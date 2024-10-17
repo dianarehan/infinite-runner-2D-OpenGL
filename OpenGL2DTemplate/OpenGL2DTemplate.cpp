@@ -66,6 +66,49 @@ const int framesPerSecond = 60;
 float speedMultiplier = 1.0f;
 const float speedIncreaseRate = 0.06f;
 
+//aesthetics
+const int numClouds = 5;
+float cloudPositions[numClouds][2];
+float cloudSpeeds[numClouds];
+
+void drawCircle(float cx, float cy, float radius, float r, float g, float b);
+
+void initClouds() {
+	float minSpacing = xCord / numClouds; // Minimum spacing between clouds
+	float lastX = 0.0f; // Track the last x position
+
+	for (int i = 0; i < numClouds; ++i) {
+		float xPos = lastX + minSpacing + (rand() % static_cast<int>(minSpacing / 2));
+		cloudPositions[i][0] = xPos; // Random x position with spacing
+		cloudPositions[i][1] = yCord - (rand() % (yCord / 2)); // Random y position
+		cloudSpeeds[i] = 1.0f + static_cast<float>(rand() % 3); // Random speed between 1.0 and 3.0
+		lastX = xPos; // Update last x position
+	}
+}
+
+void drawCloud(float x, float y, float size) {
+	glColor3f(1.0f, 1.0f, 1.0f); // White color for clouds
+	drawCircle(x, y, size, 1.0f, 1.0f, 1.0f);
+	drawCircle(x + size * 0.5f, y + size * 0.5f, size * 0.75f, 1.0f, 1.0f, 1.0f);
+	drawCircle(x + size, y, size, 1.0f, 1.0f, 1.0f);
+}
+
+void drawClouds() {
+	for (int i = 0; i < numClouds; ++i) {
+		drawCloud(cloudPositions[i][0], cloudPositions[i][1], 50.0f);
+	}
+}
+
+void updateClouds() {
+	for (int i = 0; i < numClouds; ++i) {
+		cloudPositions[i][0] -= cloudSpeeds[i] * speedMultiplier; // Move clouds to the left
+		if (cloudPositions[i][0] < -100) { // Reset cloud to the right side
+			cloudPositions[i][0] = xCord + 100;
+			cloudPositions[i][1] = yCord - (rand() % (yCord / 2)); // Random y position
+		}
+	}
+}
+
 void drawStar(float x, float y, float size) {
 	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < 5; ++i) {
@@ -250,7 +293,7 @@ void updatePlayer() {
 
 	updateObstacle();
 	updateCollectible();
-
+	updateClouds();
 	if (!isVulnerable && checkCollision()) {
 		playerLife--;
 		if (playerLife <= 0) isGameOver = true;
@@ -278,6 +321,7 @@ void updatePlayer() {
 	}
 	glutPostRedisplay();
 }
+
 
 void keyDown(unsigned char key, int x, int y) {
 	switch (key) {
@@ -392,7 +436,7 @@ void Display() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);//bg color
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
+	drawClouds();
 	if (isTimeUp) renderGameEnd();
 	
 	else if (isGameOver) renderGameOver();
@@ -428,6 +472,6 @@ void main(int argc, char** argr) {
 	glutTimerFunc(0, Timer, 0);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	gluOrtho2D(0.0, xCord, 0.0, yCord);
-
+	initClouds();
 	glutMainLoop();
 }

@@ -84,13 +84,13 @@ void keyUp(unsigned char key, int x, int y) {
 
 void drawPlayer(float x, float y) {
 	// Draw player's head (circle)
-	drawCircle(x, y + 50, 20, 1.0f, 0.8f, 0.6f); // Head
+	drawCircle(x, y + playerHeight - 10, 20, 1.0f, 0.8f, 0.6f); // Head
 
 	// Draw player's body (quad)
 	glColor3f(0.0f, 0.0f, 1.0f); // Blue body
 	glBegin(GL_QUADS);
-	glVertex2f(x - 20, y + 30);
-	glVertex2f(x + 20, y + 30);
+	glVertex2f(x - 20, y + playerHeight - 30);
+	glVertex2f(x + 20, y + playerHeight - 30);
 	glVertex2f(x + 20, y - 20);
 	glVertex2f(x - 20, y - 20);
 	glEnd();
@@ -98,16 +98,16 @@ void drawPlayer(float x, float y) {
 	// Draw player's left arm (triangle)
 	glColor3f(1.0f, 0.0f, 0.0f); // Red arms
 	glBegin(GL_TRIANGLES);
-	glVertex2f(x - 20, y + 20);
-	glVertex2f(x - 40, y);
-	glVertex2f(x - 20, y - 10);
+	glVertex2f(x - 20, y + playerHeight - 40);
+	glVertex2f(x - 40, y + playerHeight - 60);
+	glVertex2f(x - 20, y + playerHeight - 70);
 	glEnd();
 
 	// Draw player's right arm (triangle)
 	glBegin(GL_TRIANGLES);
-	glVertex2f(x + 20, y + 20);
-	glVertex2f(x + 40, y);
-	glVertex2f(x + 20, y - 10);
+	glVertex2f(x + 20, y + playerHeight - 40);
+	glVertex2f(x + 40, y + playerHeight - 60);
+	glVertex2f(x + 20, y + playerHeight - 70);
 	glEnd();
 
 	// Draw player's legs (quad for simplicity)

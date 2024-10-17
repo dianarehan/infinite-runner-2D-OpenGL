@@ -65,6 +65,7 @@ const int framesPerSecond = 60;
 //game speed modifier
 float speedMultiplier = 1.0f;
 const float speedIncreaseRate = 0.06f;
+const float initialSpeedMultiplier = 1.0f; //when the player hits smth i want to reset the speed
 
 //aesthetics
 const int numClouds = 5;
@@ -300,7 +301,8 @@ void updatePlayer() {
 
 		isVulnerable = true;
 		vulnerableTimer = maxVulnerableTime;
-		obstacleX += 200.0f; // Move obstacle further to the right
+		obstacleX += 250.0f; // Move obstacle further to the right
+		speedMultiplier = initialSpeedMultiplier;
 	}
 
 	if (checkCollectibleCollision()) {
@@ -321,7 +323,6 @@ void updatePlayer() {
 	}
 	glutPostRedisplay();
 }
-
 
 void keyDown(unsigned char key, int x, int y) {
 	switch (key) {

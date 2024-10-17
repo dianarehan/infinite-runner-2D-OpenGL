@@ -15,7 +15,7 @@ bool isDucking = false;
 float playerX = 100.0f;
 float playerY = 70.0f;
 float jumpHeight = 150.0f;
-float gravity = 9.0f;
+float gravity = 5.0f;
 float jumpVelocity = 10.0f;
 float currentJumpHeight = 0.0f;
 

@@ -10,6 +10,9 @@ int yCord = 500;
 int playerLife = 5;
 bool isJumping = false;
 bool isDucking = false;
+bool isVulnerable = false;
+int vulnerableTimer = 0;
+const int maxVulnerableTime = 30;
 
 //player position and movement
 float playerX = 100.0f;
@@ -39,6 +42,19 @@ const float obstacleColorR = 0.196f;
 const float obstacleColorG = 0.659f;
 const float obstacleColorB = 0.616f;
 
+bool checkCollision() {
+	float playerLeft = playerX - playerWidth / 2;
+	float playerRight = playerX + playerWidth / 2;
+	float playerTop = playerY + playerHeight;
+	float playerBottom = playerY;
+
+	float obstacleLeft = obstacleX;
+	float obstacleRight = obstacleX + obstacleWidth;
+	float obstacleTop = obstacleY + obstacleHeight;
+	float obstacleBottom = obstacleY;
+
+	return !(playerLeft > obstacleRight || playerRight < obstacleLeft || playerTop < obstacleBottom || playerBottom > obstacleTop);
+}
 
 void updateObstacle() {
 	obstacleX -= 5.0f; // Move obstacle to the left
@@ -97,7 +113,26 @@ void updatePlayer() {
 	else {
 		playerHeight = 60;
 	}
+
 	updateObstacle();
+	if (!isVulnerable && checkCollision()) {
+		// Handle collision (e.g., reduce player life, end game, etc.)
+		playerLife--;
+		if (playerLife <= 0) {
+
+		}
+		isVulnerable = true;
+		vulnerableTimer = maxVulnerableTime;
+		obstacleX += 200.0f; // Move obstacle further to the right
+	}
+
+	// Handle vulnerable state
+	if (isVulnerable) {
+		vulnerableTimer--;
+		if (vulnerableTimer <= 0) {
+			isVulnerable = false;
+		}
+	}
 	glutPostRedisplay();
 }
 
@@ -122,6 +157,7 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void drawPlayer(float x, float y) {
+
 	// Draw player's head (circle)
 	drawCircle(x, y + playerHeight - 10, 20, 1.0f, 0.8f, 0.6f); // Head
 

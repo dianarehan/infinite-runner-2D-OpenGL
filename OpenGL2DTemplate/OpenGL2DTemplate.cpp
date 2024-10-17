@@ -42,7 +42,7 @@ float obstacleHeight = 30.0f;
 
 //collectibles properties
 float collectibleX = xCord;
-float collectibleY = 150.0f;
+float collectibleY = 270.0f;
 float collectibleWidth = 20.0f;
 float collectibleHeight = 20.0f;
 bool isCollectibleActive = true;

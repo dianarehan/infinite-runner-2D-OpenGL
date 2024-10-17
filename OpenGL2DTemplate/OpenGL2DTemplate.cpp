@@ -37,10 +37,13 @@ float obstacleY = 70.0f;
 float obstacleWidth = 30.0f;
 float obstacleHeight = 30.0f;
 
-// Color for obstacles
+// Colors
 const float obstacleColorR = 0.196f;
 const float obstacleColorG = 0.659f;
 const float obstacleColorB = 0.616f;
+
+//game data
+bool isGameOver = false;
 
 bool checkCollision() {
 	float playerLeft = playerX - playerWidth / 2;
@@ -54,6 +57,15 @@ bool checkCollision() {
 	float obstacleBottom = obstacleY;
 
 	return !(playerLeft > obstacleRight || playerRight < obstacleLeft || playerTop < obstacleBottom || playerBottom > obstacleTop);
+}
+
+void renderGameOver() {
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glRasterPos2f(xCord / 2 - 50, yCord / 2);
+	const char* message = "Game Lose";
+	for (const char* c = message; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+	}
 }
 
 void updateObstacle() {
@@ -95,6 +107,8 @@ void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 }
 
 void updatePlayer() {
+	if (isGameOver) return;
+	
 	if (isJumping) {
 		playerY += jumpVelocity;
 		currentJumpHeight += jumpVelocity;
@@ -115,12 +129,11 @@ void updatePlayer() {
 	}
 
 	updateObstacle();
-	if (!isVulnerable && checkCollision()) {
-		// Handle collision (e.g., reduce player life, end game, etc.)
-		playerLife--;
-		if (playerLife <= 0) {
 
-		}
+	if (!isVulnerable && checkCollision()) {
+		playerLife--;
+		if (playerLife <= 0) isGameOver = true;
+
 		isVulnerable = true;
 		vulnerableTimer = maxVulnerableTime;
 		obstacleX += 200.0f; // Move obstacle further to the right
@@ -249,11 +262,16 @@ void Display() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);//bg color
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	drawUpperBoundary();
-	drawLowerBoundary();
-	initializeHealth(playerLife);
-	drawObstacle();
-	drawPlayer(playerX, playerY);
+
+	if (isGameOver) renderGameOver();	
+	
+	else {
+		drawUpperBoundary();
+		drawLowerBoundary();
+		initializeHealth(playerLife);
+		drawObstacle();
+		drawPlayer(playerX, playerY);
+	}
 	glFlush();
 }
 

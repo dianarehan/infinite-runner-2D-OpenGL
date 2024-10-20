@@ -98,7 +98,7 @@ const int shieldEffectDuration =5;
 float playerColorR = 1.0f;
 float playerColorG = 1.0f;
 float playerColorB = 1.0f;
-const int colorChangeDuration = 5;
+const int colorChangeDuration = 5 * framesPerSecond;;
 int colorChangeTimer = 0;
 bool isColorChanged = false;
 
@@ -109,6 +109,11 @@ const int potionMessageDuration = 3;
 bool showShieldMessage = false;
 int shieldMessageTimer = 0;
 const int shieldMessageDuration = 3;
+
+//powerups anim
+float potionFloatOffset = 0.0f;  // Controls the floating animation
+const float FLOAT_SPEED = 2.0f;  // How fast it floats
+const float FLOAT_AMPLITUDE = 1.0f;  // How far it floats up/down
 
 void drawText(float x, float y, const char* text) {
 	glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
@@ -386,7 +391,13 @@ void drawPotion(float x, float y, float size) {
 
 void updatePotion() {
 	if (isPotionActive) {
+		// Update horizontal movement
 		potionX -= 5.0f * speedMultiplier;
+
+		// Update floating movement
+		potionFloatOffset += FLOAT_SPEED;
+		float floatingY = sin(potionFloatOffset * 0.05f) * FLOAT_AMPLITUDE;
+		potionY = potionY + floatingY;  // Add the floating offset to base Y position
 
 		if (potionX + potionWidth < 0) {
 			isPotionActive = false;
@@ -397,6 +408,7 @@ void updatePotion() {
 		if (potionTimer >= potionSpawnInterval) {
 			potionX = xCord;
 			potionY = 80.0f + (rand() % 2) * playerHeight;
+			potionFloatOffset = 0.0f;  // Reset the float offset when spawning new potion
 			isPotionActive = true;
 			potionTimer = 0;
 		}
@@ -557,9 +569,6 @@ void updatePlayer() {
 		colorChangeTimer--;
 		if (colorChangeTimer <= 0) {
 			isColorChanged = false;
-			playerColorR = 1.0f;
-			playerColorG = 1.0f;
-			playerColorB = 1.0f;
 		}
 	}
 	// Handle vulnerable state
@@ -745,10 +754,10 @@ void main(int argc, char** argr) {
 	glutInitWindowPosition(150, 150);
 
 	glutCreateWindow("Game");
+	glutTimerFunc(0, Timer, 0);
 	glutDisplayFunc(Display);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
-	glutTimerFunc(0, Timer, 0);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	gluOrtho2D(0.0, xCord, 0.0, yCord);
 	initClouds();

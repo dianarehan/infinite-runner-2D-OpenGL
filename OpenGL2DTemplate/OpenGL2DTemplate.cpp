@@ -76,6 +76,56 @@ const int numClouds = 5;
 float cloudPositions[numClouds][2];
 float cloudSpeeds[numClouds];
 
+// Power-up properties
+float potionX = xCord;
+float potionY = 70.0f;
+float potionWidth = 20.0f;
+float potionHeight = 20.0f;
+bool isPotionActive = false;
+int potionTimer = 0;
+const int potionSpawnInterval = 15 * framesPerSecond;
+const int potionEffectDuration = 2;
+
+float shieldX = xCord;
+float shieldY = 70.0f;
+float shieldWidth = 20.0f;
+float shieldHeight = 20.0f;
+bool isShieldActive = false;
+int shieldTimer = 0;
+const int shieldSpawnInterval = 10* framesPerSecond;
+const int shieldEffectDuration =2;
+
+bool isTimerFrozen = false;
+int timerFreezeCounter = 0;
+
+
+bool checkPotionCollision() {
+	float playerLeft = playerX - playerWidth / 2;
+	float playerRight = playerX + playerWidth / 2;
+	float playerTop = playerY + playerHeight;
+	float playerBottom = playerY;
+
+	float potionLeft = potionX;
+	float potionRight = potionX + potionWidth;
+	float potionTop = potionY + potionHeight;
+	float potionBottom = potionY;
+
+	return !(playerLeft > potionRight || playerRight < potionLeft || playerTop < potionBottom || playerBottom > potionTop);
+}
+
+bool checkShieldCollision() {
+	float playerLeft = playerX - playerWidth / 2;
+	float playerRight = playerX + playerWidth / 2;
+	float playerTop = playerY + playerHeight;
+	float playerBottom = playerY;
+
+	float shieldLeft = shieldX;
+	float shieldRight = shieldX + shieldWidth;
+	float shieldTop = shieldY + shieldHeight;
+	float shieldBottom = shieldY;
+
+	return !(playerLeft > shieldRight || playerRight < shieldLeft || playerTop < shieldBottom || playerBottom > shieldTop);
+}
 void drawCircle(float cx, float cy, float radius, float r, float g, float b);
 
 void initClouds() {
@@ -123,6 +173,17 @@ void drawStar(float x, float y, float size) {
 		glVertex2f(x + size * cos(angle1), y + size * sin(angle1));
 		glVertex2f(x + size * cos(angle2), y + size * sin(angle2));
 	}
+	glEnd();
+}
+
+void drawQuad(float x1, float y1, float x2, float y2, float r, float g, float b) {
+	glColor3f(r, g, b);
+
+	glBegin(GL_QUADS);
+	glVertex2f(x1, y1);
+	glVertex2f(x2, y1);
+	glVertex2f(x2, y2);
+	glVertex2f(x1, y2);
 	glEnd();
 }
 
@@ -261,14 +322,73 @@ void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 	glEnd();
 }
 
+void drawPotion() {
+	if (isPotionActive) {
+		glColor3f(0.0f, 1.0f, 0.0f); // Green color for the potion
+		drawQuad(potionX, potionY, potionX + potionWidth, potionY + potionHeight, 0.0f, 1.0f, 0.0f);
+	}
+}
+void updatePotion() {
+	if (isPotionActive) {
+		potionX -= 5.0f * speedMultiplier; // Move potion to the left
+
+		if (potionX + potionWidth < 0) {
+			isPotionActive = false;
+		}
+	}
+	else {
+		potionTimer++;
+		if (potionTimer >= potionSpawnInterval) {
+			potionX = xCord;
+			potionY = 70.0f + (rand() % 2) * playerHeight;
+			isPotionActive = true;
+			potionTimer = 0;
+		}
+	}
+}
+
+void updateShield() {
+	if (isShieldActive) {
+		shieldX -= 5.0f * speedMultiplier; // Move shield to the left
+
+		if (shieldX + shieldWidth < 0) {
+			isShieldActive = false;
+		}
+	}
+	else {
+		shieldTimer++;
+		if (shieldTimer >= shieldSpawnInterval) {
+			shieldX = xCord;
+			shieldY = 70.0f + (rand() % 2) * playerHeight;
+			isShieldActive = true;
+			shieldTimer = 0;
+		}
+	}
+}
+
+void drawShield() {
+	if (isShieldActive) {
+		glColor3f(0.0f, 0.0f, 1.0f); // Blue color for the shield
+		drawQuad(shieldX, shieldY, shieldX + shieldWidth, shieldY + shieldHeight, 0.0f, 0.0f, 1.0f);
+	}
+}
 void updatePlayer() {
 	if (isGameOver || isTimeUp) return;
 
-	timerFrameCount++;
-	if (timerFrameCount >= framesPerSecond) {
-		timer--;
-		timerFrameCount = 0;
-		speedMultiplier += speedIncreaseRate;
+	if (!isTimerFrozen) {
+		timerFrameCount++;
+		if (timerFrameCount >= framesPerSecond) {
+			timer--;
+			timerFrameCount = 0;
+			speedMultiplier += speedIncreaseRate;
+		}
+	}
+	else {
+		timerFreezeCounter++;
+		if (timerFreezeCounter >= potionEffectDuration) {
+			isTimerFrozen = false;
+			timerFreezeCounter = 0;
+		}
 	}
 
 	if (timer <= 0) {
@@ -299,6 +419,9 @@ void updatePlayer() {
 	updateObstacle();
 	updateCollectible();
 	updateClouds();
+	updatePotion();
+	updateShield();
+
 	if (!isVulnerable && checkCollision()) {
 		playerLife--;
 		if (playerLife <= 0) isGameOver = true;
@@ -306,6 +429,7 @@ void updatePlayer() {
 		isVulnerable = true;
 		vulnerableTimer = maxVulnerableTime;
 		obstacleX += 250.0f; // Move obstacle further to the right
+		collectibleX += 100;
 		speedMultiplier = initialSpeedMultiplier;
 	}
 
@@ -313,11 +437,20 @@ void updatePlayer() {
 		isCollectibleActive = false;
 		playerScore ++;
 		// Reset collectible position
-		collectibleX = xCord;
-		collectibleY = 70.0f + (rand() % 2) * 60;
+		collectibleX = xCord+20;
+		collectibleY = 80.0f + (rand() % 2) * 60;
 		isCollectibleActive = true;
 	}
+	if (checkPotionCollision()) {
+		isPotionActive = false;
+		isTimerFrozen = true;
+	}
 
+	if (checkShieldCollision()) {
+		isShieldActive = false;
+		isVulnerable = true;
+		vulnerableTimer = shieldEffectDuration;
+	}
 	// Handle vulnerable state
 	if (isVulnerable) {
 		vulnerableTimer--;
@@ -325,6 +458,7 @@ void updatePlayer() {
 			isVulnerable = false;
 		}
 	}
+
 	glutPostRedisplay();
 }
 
@@ -392,16 +526,6 @@ void drawPlayer(float x, float y) {
 	glEnd();
 }
 
-void drawQuad(float x1, float y1, float x2, float y2, float r, float g, float b) {
-	glColor3f(r, g, b);
-
-	glBegin(GL_QUADS);
-	glVertex2f(x1, y1);
-	glVertex2f(x2, y1);
-	glVertex2f(x2, y2);
-	glVertex2f(x1, y2);
-	glEnd();
-}
 
 void drawHeart(float x, float y) {
 	glColor3f(1.0f, 0.0f, 0.0f);//red hearts
@@ -465,6 +589,8 @@ void Display() {
 		initializeHealth(playerLife);
 		drawObstacle();
 		drawCollectible();
+		drawPotion();
+		drawShield();
 		drawPlayer(playerX, playerY);
 		renderScore();
 		renderTimer();

@@ -2,6 +2,10 @@
 #include <glut.h>
 #include <math.h>	
 #include<string>
+#include <iostream>
+#include <windows.h>
+#include <tchar.h>
+using namespace std;
 
 //sizes of the screen
 int xCord = 1000;
@@ -88,7 +92,7 @@ void initClouds() {
 }
 
 void drawCloud(float x, float y, float size) {
-	glColor3f(1.0f, 1.0f, 1.0f); // White color for clouds
+	glClearColor(211 / 255.0f, 220 / 255.0f, 230 / 255.0f, 1.0f);
 	drawCircle(x, y, size, 1.0f, 1.0f, 1.0f);
 	drawCircle(x + size * 0.5f, y + size * 0.5f, size * 0.75f, 1.0f, 1.0f, 1.0f);
 	drawCircle(x + size, y, size, 1.0f, 1.0f, 1.0f);
@@ -190,7 +194,7 @@ void renderGameOver() {
 }
 
 void renderTimer() {
-	glColor3f(1.0f, 1.0f, 1.0f); // White color for the timer
+	glColor3f(0.0f, 0.0f, 0.0f);
 	glRasterPos2f(900, upperHeight); // Position below the score
 	std::string timerText = "Time: " + std::to_string(timer);
 	const char* timerCStr = timerText.c_str();
@@ -210,7 +214,7 @@ void renderGameEnd() {
 }
 
 void renderScore() {
-	glColor3f(1.0f, 1.0f, 1.0f); // White color for the score
+	glColor3f(0.0f, 0.0f, 0.0f);
 	glRasterPos2f(450, upperHeight);
 	std::string scoreText = "Score: " + std::to_string(playerScore);
 	const char* scoreCStr = scoreText.c_str();
@@ -425,20 +429,19 @@ void drawLowerBoundary() {
 }
 
 void initializeHealth(int numHearts) {
-	float startX = 40.0f;  // Starting x position
-	float startY = yCord - 100.0f; // Adjust to be below the upper boundary
-	float heartWidth = 16.0f; // Width of each heart
-	float heartHeight = 13.0f; // Height of each heart
+	float startX = 40.0f;
+	float startY = yCord - 100.0f;
+	float heartWidth = 16.0f;
+	float heartHeight = 13.0f;
 	float frameWidth = numHearts * heartSpacing;
-	float frameHeight = heartHeight * 2; // Adjust as needed for the height of the hearts
+	float frameHeight = heartHeight * 2;
 
-	// Draw white frame
-	glColor3f(1.0f, 1.0f, 1.0f); // White color
+	glColor3f(237 / 255.0f, 194 / 255.0f, 0 / 255.0f);
 	glBegin(GL_LINE_LOOP);
-	glVertex2f(startX - 10, startY - 10);
-	glVertex2f(startX + frameWidth + 10, startY - 10);
-	glVertex2f(startX + frameWidth + 10, startY + frameHeight + 10);
-	glVertex2f(startX - 10, startY + frameHeight + 10);
+	glVertex2f(startX - 10, startY - 5);
+	glVertex2f(startX + frameWidth -7, startY - 5);
+	glVertex2f(startX + frameWidth -7, startY + frameHeight+11);
+	glVertex2f(startX - 10, startY + frameHeight +11);
 	glEnd();
 
 	// Draw hearts
@@ -447,10 +450,8 @@ void initializeHealth(int numHearts) {
 	}
 }
 
-
-
 void Display() {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);//bg color
+	glClearColor(21 / 255.0f, 54 / 255.0f, 82 / 255.0f, 1.0f);//bg color
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	drawClouds();
@@ -492,3 +493,18 @@ void main(int argc, char** argr) {
 	initClouds();
 	glutMainLoop();
 }
+
+
+/*#include <iostream>
+#include <windows.h>
+#include <tchar.h>
+using namespace std;
+
+int main() {
+bool played = PlaySound(_T("C:\\Users\\merna\\Downloads\\Eng VII\\Graphics\\OpenGL Ass1\\OpenGL2DTemplate\\file_example_WAV_5MG.wav"), NULL,  SND_ASYNC);
+
+	printf("Success or not %i", played);
+	Sleep(5000); // Wait for 2 seconds
+
+	return 0;
+}*/

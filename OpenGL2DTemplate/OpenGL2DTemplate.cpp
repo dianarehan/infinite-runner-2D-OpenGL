@@ -5,6 +5,9 @@
 #include <iostream>
 #include <windows.h>
 #include <tchar.h>
+#include <thread>
+#include <chrono>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 
 //sizes of the screen
@@ -83,7 +86,7 @@ float potionWidth = 20.0f;
 float potionHeight = 20.0f;
 bool isPotionActive = false;
 int potionTimer = 0;
-const int potionSpawnInterval = 15 * framesPerSecond;
+const int potionSpawnInterval = 15 * 16;
 
 float shieldX = xCord;
 float shieldY = 70.0f;
@@ -91,14 +94,14 @@ float shieldWidth = 20.0f;
 float shieldHeight = 20.0f;
 bool isShieldActive = false;
 int shieldTimer = 0;
-const int shieldSpawnInterval = 10* framesPerSecond;
+const int shieldSpawnInterval = 10* 16;
 const int shieldEffectDuration =5;
 
 //player colors new
 float playerColorR = 1.0f;
 float playerColorG = 1.0f;
 float playerColorB = 1.0f;
-const int colorChangeDuration = 5 * framesPerSecond;;
+const int colorChangeDuration = 5 * 16;;
 int colorChangeTimer = 0;
 bool isColorChanged = false;
 
@@ -115,6 +118,20 @@ float potionFloatOffset = 0.0f;  // Controls the floating animation
 const float FLOAT_SPEED = 2.0f;  // How fast it floats
 const float FLOAT_AMPLITUDE = 1.0f;  // How far it floats up/down
 
+bool powSoundPlayed = false; // To track if the "pow" sound has been played
+bool retroCoinSoundPlayed = false;
+
+void playSoundEffect(const TCHAR* soundFile) {
+	PlaySound(soundFile, NULL, SND_FILENAME | SND_ASYNC);
+}
+
+void playSoundInThread(const TCHAR* filePath) {
+	std::thread soundThread(playSoundEffect, filePath);
+	soundThread.detach();
+}
+void playMainSound() {
+	PlaySound(TEXT("bg_sound.wav"), NULL, SND_FILENAME | SND_ASYNC);
+}
 void drawText(float x, float y, const char* text) {
 	glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
 	glRasterPos2f(x, y);
@@ -483,6 +500,14 @@ void drawShield() {
 	}
 }
 
+void playCollectibleSound() {
+	PlaySound(TEXT("retro-coin.wav"), NULL, SND_FILENAME | SND_ASYNC);
+}
+
+void playObstacleSound() {
+	PlaySound(TEXT("pow.wav"), NULL, SND_FILENAME | SND_ASYNC);
+}
+
 void updatePlayer() {
 	if (isGameOver || isTimeUp) return;
 
@@ -526,6 +551,8 @@ void updatePlayer() {
 
 	if (!isVulnerable && checkCollision()) {
 		playerLife--;
+		playSoundEffect(_T("pow.wav"));
+		Sleep(200);
 		if (playerLife <= 0) isGameOver = true;
 
 		isVulnerable = true;
@@ -533,14 +560,16 @@ void updatePlayer() {
 		obstacleX += 250.0f; // Move obstacle further to the right
 		collectibleX += 100;
 		shieldX += 150;
-
+		playSoundEffect(_T("bg_sound.wav"));
 		speedMultiplier = initialSpeedMultiplier;
 	}
+	
 
 	if (checkCollectibleCollision()) {
 		isCollectibleActive = false;
 		playerScore ++;
-		// Reset collectible position
+		std::thread(playCollectibleSound).detach();
+
 		collectibleX = xCord+20;
 		collectibleY = 80.0f + (rand() % 2) * 60;
 		isCollectibleActive = true;
@@ -549,6 +578,9 @@ void updatePlayer() {
 		isPotionActive = false;
 		isColorChanged = true;
 		colorChangeTimer = colorChangeDuration;
+
+		std::thread(playCollectibleSound).detach();
+
 		// Change player colors
 		playerColorR = static_cast<float>(rand()) / RAND_MAX;
 		playerColorG = static_cast<float>(rand()) / RAND_MAX;
@@ -560,6 +592,8 @@ void updatePlayer() {
 	if (checkShieldCollision()) {
 		isShieldActive = false;
 		isVulnerable = true;
+		std::thread(playCollectibleSound).detach();
+
 		vulnerableTimer = shieldEffectDuration;
 		showShieldMessage = true;
 		shieldMessageTimer = shieldMessageDuration;
@@ -711,16 +745,23 @@ void initializeHealth(int numHearts) {
 	}
 }
 
+
 void Display() {
 	glClearColor(21 / 255.0f, 54 / 255.0f, 82 / 255.0f, 1.0f);//bg color
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	drawClouds();
-	if (isTimeUp) renderGameEnd();
-	
-	else if (isGameOver) renderGameOver();
+	if (isTimeUp) {
+		playSoundEffect(TEXT("win.wav"));
+		renderGameEnd();
+	}
+	else if (isGameOver) {
+		playSoundEffect(TEXT("lose.wav"));
+		renderGameOver();
+	}
 	
 	else {
+		playSoundEffect(TEXT("bg_sound.wav"));
 		drawUpperBoundary();
 		drawLowerBoundary();
 		initializeHealth(playerLife);
@@ -747,12 +788,13 @@ void Timer(int value) {
 	glutTimerFunc(16, Timer, 0);
 }
 
+
 void main(int argc, char** argr) {
 	glutInit(&argc, argr);
 
 	glutInitWindowSize(xCord, yCord);
 	glutInitWindowPosition(150, 150);
-
+	playSoundEffect(TEXT("bg_sound.wav"));
 	glutCreateWindow("Game");
 	glutTimerFunc(0, Timer, 0);
 	glutDisplayFunc(Display);

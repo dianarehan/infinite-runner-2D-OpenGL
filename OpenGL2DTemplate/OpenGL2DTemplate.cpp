@@ -322,10 +322,45 @@ void drawCircle(float cx, float cy, float radius, float r, float g, float b) {
 	glEnd();
 }
 
-void drawPotion() {
+void drawPotion(float x, float y, float size) {
 	if (isPotionActive) {
-		glColor3f(0.0f, 1.0f, 0.0f); // Green color for the potion
-		drawQuad(potionX, potionY, potionX + potionWidth, potionY + potionHeight, 0.0f, 1.0f, 0.0f);
+		float x = potionX;
+		float y = potionY;
+		float width = potionWidth;
+		float height = potionHeight;
+		glColor3f(0.0f, 0.5f, 1.0f); // Light blue color
+		glBegin(GL_QUADS);
+		glVertex2f(x - size / 4, y);
+		glVertex2f(x + size / 4, y);
+		glVertex2f(x + size / 4, y + size / 2);
+		glVertex2f(x - size / 4, y + size / 2);
+		glEnd();
+
+		// Draw the bottle neck (quad)
+		glColor3f(0.0f, 0.5f, 1.0f); // Light blue color
+		glBegin(GL_QUADS);
+		glVertex2f(x - size / 8, y + size / 2);
+		glVertex2f(x + size / 8, y + size / 2);
+		glVertex2f(x + size / 8, y + size * 0.75f);
+		glVertex2f(x - size / 8, y + size * 0.75f);
+		glEnd();
+
+		// Draw the bottle cap (triangle)
+		glColor3f(0.5f, 0.0f, 0.0f); // Dark red color
+		glBegin(GL_TRIANGLES);
+		glVertex2f(x - size / 8, y + size * 0.75f);
+		glVertex2f(x + size / 8, y + size * 0.75f);
+		glVertex2f(x, y + size);
+		glEnd();
+
+		// Draw the liquid inside the bottle (quad)
+		glColor3f(0.0f, 1.0f, 0.0f); // Green color
+		glBegin(GL_QUADS);
+		glVertex2f(x - size / 4 + 2, y + 2);
+		glVertex2f(x + size / 4 - 2, y + 2);
+		glVertex2f(x + size / 4 - 2, y + size / 2 - 2);
+		glVertex2f(x - size / 4 + 2, y + size / 2 - 2);
+		glEnd();
 	}
 }
 void updatePotion() {
@@ -526,7 +561,6 @@ void drawPlayer(float x, float y) {
 	glEnd();
 }
 
-
 void drawHeart(float x, float y) {
 	glColor3f(1.0f, 0.0f, 0.0f);//red hearts
 	glBegin(GL_POLYGON);
@@ -589,7 +623,7 @@ void Display() {
 		initializeHealth(playerLife);
 		drawObstacle();
 		drawCollectible();
-		drawPotion();
+		drawPotion(100.0f, 100.0f, 50.0f);
 		drawShield();
 		drawPlayer(playerX, playerY);
 		renderScore();

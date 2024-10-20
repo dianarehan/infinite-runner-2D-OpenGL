@@ -84,7 +84,6 @@ float potionHeight = 20.0f;
 bool isPotionActive = false;
 int potionTimer = 0;
 const int potionSpawnInterval = 15 * framesPerSecond;
-const int potionEffectDuration = 2;
 
 float shieldX = xCord;
 float shieldY = 70.0f;
@@ -93,17 +92,28 @@ float shieldHeight = 20.0f;
 bool isShieldActive = false;
 int shieldTimer = 0;
 const int shieldSpawnInterval = 10* framesPerSecond;
-const int shieldEffectDuration =2;
+const int shieldEffectDuration =5;
 
 //player colors new
 float playerColorR = 1.0f;
 float playerColorG = 1.0f;
 float playerColorB = 1.0f;
-const int colorChangeDuration = 5 * framesPerSecond; // 5 seconds
+const int colorChangeDuration = 5;
 int colorChangeTimer = 0;
 bool isColorChanged = false;
 
+//messages for powerups
+bool showPotionMessage = false;
+int potionMessageTimer = 0;
+const int potionMessageDuration = 3;
 
+void drawText(float x, float y, const char* text) {
+	glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
+	glRasterPos2f(x, y);
+	for (const char* c = text; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+	}
+}
 
 bool checkPotionCollision() {
 	float playerLeft = playerX - playerWidth / 2;
@@ -132,6 +142,7 @@ bool checkShieldCollision() {
 
 	return !(playerLeft > shieldRight || playerRight < shieldLeft || playerTop < shieldBottom || playerBottom > shieldTop);
 }
+
 void drawCircle(float cx, float cy, float radius, float r, float g, float b);
 
 void initClouds() {
@@ -372,7 +383,7 @@ void drawPotion(float x, float y, float size) {
 
 void updatePotion() {
 	if (isPotionActive) {
-		potionX -= 5.0f * speedMultiplier; // Move potion to the left
+		potionX -= 5.0f * speedMultiplier;
 
 		if (potionX + potionWidth < 0) {
 			isPotionActive = false;
@@ -382,7 +393,7 @@ void updatePotion() {
 		potionTimer++;
 		if (potionTimer >= potionSpawnInterval) {
 			potionX = xCord;
-			potionY = 70.0f + (rand() % 2) * playerHeight;
+			potionY = 80.0f + (rand() % 2) * playerHeight;
 			isPotionActive = true;
 			potionTimer = 0;
 		}
@@ -464,6 +475,8 @@ void updatePlayer() {
 		vulnerableTimer = maxVulnerableTime;
 		obstacleX += 250.0f; // Move obstacle further to the right
 		collectibleX += 100;
+		shieldX += 150;
+
 		speedMultiplier = initialSpeedMultiplier;
 	}
 
@@ -483,6 +496,8 @@ void updatePlayer() {
 		playerColorR = static_cast<float>(rand()) / RAND_MAX;
 		playerColorG = static_cast<float>(rand()) / RAND_MAX;
 		playerColorB = static_cast<float>(rand()) / RAND_MAX;
+		showPotionMessage = true;
+		potionMessageTimer = potionMessageDuration;
 	}
 
 	if (checkShieldCollision()) {
@@ -495,7 +510,6 @@ void updatePlayer() {
 		colorChangeTimer--;
 		if (colorChangeTimer <= 0) {
 			isColorChanged = false;
-			// Reset player colors to default
 			playerColorR = 1.0f;
 			playerColorG = 1.0f;
 			playerColorB = 1.0f;
@@ -647,6 +661,13 @@ void Display() {
 		drawPotion(100.0f, 100.0f, 50.0f);
 		drawShield();
 		drawPlayer(playerX, playerY);
+		if (showPotionMessage) {
+			drawText(playerX, playerY + playerHeight + 20, "Potion Collected! Enjoy Colors Change!");
+			potionMessageTimer--;
+			if (potionMessageTimer <= 0) {
+				showPotionMessage = false;
+			}
+		}
 		renderScore();
 		renderTimer();
 	}

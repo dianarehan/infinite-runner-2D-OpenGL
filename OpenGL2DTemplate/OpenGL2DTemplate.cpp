@@ -95,8 +95,14 @@ int shieldTimer = 0;
 const int shieldSpawnInterval = 10* framesPerSecond;
 const int shieldEffectDuration =2;
 
-bool isTimerFrozen = false;
-int timerFreezeCounter = 0;
+//player colors new
+float playerColorR = 1.0f;
+float playerColorG = 1.0f;
+float playerColorB = 1.0f;
+const int colorChangeDuration = 5 * framesPerSecond; // 5 seconds
+int colorChangeTimer = 0;
+bool isColorChanged = false;
+
 
 
 bool checkPotionCollision() {
@@ -363,6 +369,7 @@ void drawPotion(float x, float y, float size) {
 		glEnd();
 	}
 }
+
 void updatePotion() {
 	if (isPotionActive) {
 		potionX -= 5.0f * speedMultiplier; // Move potion to the left
@@ -407,23 +414,15 @@ void drawShield() {
 		drawQuad(shieldX, shieldY, shieldX + shieldWidth, shieldY + shieldHeight, 0.0f, 0.0f, 1.0f);
 	}
 }
+
 void updatePlayer() {
 	if (isGameOver || isTimeUp) return;
 
-	if (!isTimerFrozen) {
-		timerFrameCount++;
-		if (timerFrameCount >= framesPerSecond) {
-			timer--;
-			timerFrameCount = 0;
-			speedMultiplier += speedIncreaseRate;
-		}
-	}
-	else {
-		timerFreezeCounter++;
-		if (timerFreezeCounter >= potionEffectDuration) {
-			isTimerFrozen = false;
-			timerFreezeCounter = 0;
-		}
+	timerFrameCount++;
+	if (timerFrameCount >= framesPerSecond) {
+		timer--;
+		timerFrameCount = 0;
+		speedMultiplier += speedIncreaseRate;
 	}
 
 	if (timer <= 0) {
@@ -478,13 +477,29 @@ void updatePlayer() {
 	}
 	if (checkPotionCollision()) {
 		isPotionActive = false;
-		isTimerFrozen = true;
+		isColorChanged = true;
+		colorChangeTimer = colorChangeDuration;
+		// Change player colors
+		playerColorR = static_cast<float>(rand()) / RAND_MAX;
+		playerColorG = static_cast<float>(rand()) / RAND_MAX;
+		playerColorB = static_cast<float>(rand()) / RAND_MAX;
 	}
 
 	if (checkShieldCollision()) {
 		isShieldActive = false;
 		isVulnerable = true;
 		vulnerableTimer = shieldEffectDuration;
+	}
+
+	if (isColorChanged) {
+		colorChangeTimer--;
+		if (colorChangeTimer <= 0) {
+			isColorChanged = false;
+			// Reset player colors to default
+			playerColorR = 1.0f;
+			playerColorG = 1.0f;
+			playerColorB = 1.0f;
+		}
 	}
 	// Handle vulnerable state
 	if (isVulnerable) {
@@ -520,10 +535,12 @@ void keyUp(unsigned char key, int x, int y) {
 void drawPlayer(float x, float y) {
 
 	// Draw player's head (circle)
-	drawCircle(x, y + playerHeight - 10, 20, 1.0f, 0.8f, 0.6f); // Head
-
+	if (isColorChanged) drawCircle(x, y + playerHeight - 10, 20, playerColorR, playerColorG,playerColorB); // Head
+	else drawCircle(x, y + playerHeight - 10, 20, 1.0f, 0.8f, 0.6f); // Head
+	
 	// Draw player's body (quad)
-	glColor3f(0.0f, 0.0f, 1.0f); // Blue body
+	if (isColorChanged) glColor3f(playerColorR, playerColorG, playerColorB);
+	else glColor3f(0.0f, 0.0f, 1.0f); // Blue body
 	glBegin(GL_QUADS);
 	glVertex2f(x - 20, y + playerHeight - 30);
 	glVertex2f(x + 20, y + playerHeight - 30);
@@ -532,7 +549,9 @@ void drawPlayer(float x, float y) {
 	glEnd();
 
 	// Draw player's left arm (triangle)
-	glColor3f(1.0f, 0.0f, 0.0f); // Red arms
+	if (isColorChanged) glColor3f(playerColorR, playerColorG, playerColorB);
+	else
+		glColor3f(1.0f, 0.0f, 0.0f); // Red arms
 	glBegin(GL_TRIANGLES);
 	glVertex2f(x - 20, y + playerHeight - 40);
 	glVertex2f(x - 40, y + playerHeight - 60);
@@ -547,7 +566,9 @@ void drawPlayer(float x, float y) {
 	glEnd();
 
 	// Draw player's legs (quad for simplicity)
-	glColor3f(0.0f, 1.0f, 0.0f); // Green legs
+	if (isColorChanged) glColor3f(playerColorR, playerColorG, playerColorB);
+	else
+		glColor3f(0.0f, 1.0f, 0.0f); // Green legs
 	glBegin(GL_QUADS);
 	glVertex2f(x - 15, y - 20);
 	glVertex2f(x - 5, y - 20);

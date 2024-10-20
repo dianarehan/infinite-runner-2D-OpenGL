@@ -106,6 +106,9 @@ bool isColorChanged = false;
 bool showPotionMessage = false;
 int potionMessageTimer = 0;
 const int potionMessageDuration = 3;
+bool showShieldMessage = false;
+int shieldMessageTimer = 0;
+const int shieldMessageDuration = 3;
 
 void drawText(float x, float y, const char* text) {
 	glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
@@ -421,8 +424,50 @@ void updateShield() {
 
 void drawShield() {
 	if (isShieldActive) {
-		glColor3f(0.0f, 0.0f, 1.0f); // Blue color for the shield
-		drawQuad(shieldX, shieldY, shieldX + shieldWidth, shieldY + shieldHeight, 0.0f, 0.0f, 1.0f);
+		
+
+		// Draw using GL_LINE_LOOP to outline the shield
+		glColor3f(0.3f, 0.3f, 1.0f); // Light blue
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(shieldX, shieldY);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY + shieldHeight);
+		glVertex2f(shieldX + shieldWidth, shieldY);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY - shieldHeight / 2);
+		glEnd();
+
+		// Draw using GL_TRIANGLE_FAN to fill the shield
+		glColor3f(0.0f, 0.0f, 0.8f); // Medium blue
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY); // Center point
+		glVertex2f(shieldX, shieldY);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY + shieldHeight);
+		glVertex2f(shieldX + shieldWidth, shieldY);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY - shieldHeight / 2);
+		glVertex2f(shieldX, shieldY); // Close the fan
+		glEnd();
+
+		// Draw using GL_LINES for additional details
+		glColor3f(0.0f, 0.0f, 0.6f); // Dark blue
+		glBegin(GL_LINES);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY + shieldHeight);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY);
+		glVertex2f(shieldX + shieldWidth / 2, shieldY - shieldHeight / 2);
+		glEnd();
+
+		// Draw using GL_QUADS for a cross in the center
+		glColor3f(0.5f, 0.5f, 1.0f); // Very light blue
+		glBegin(GL_QUADS);
+		glVertex2f(shieldX + shieldWidth / 2 - 5, shieldY + 10);
+		glVertex2f(shieldX + shieldWidth / 2 + 5, shieldY + 10);
+		glVertex2f(shieldX + shieldWidth / 2 + 5, shieldY - 10);
+		glVertex2f(shieldX + shieldWidth / 2 - 5, shieldY - 10);
+
+		glVertex2f(shieldX + shieldWidth / 2 - 10, shieldY + 5);
+		glVertex2f(shieldX + shieldWidth / 2 + 10, shieldY + 5);
+		glVertex2f(shieldX + shieldWidth / 2 + 10, shieldY - 5);
+		glVertex2f(shieldX + shieldWidth / 2 - 10, shieldY - 5);
+		glEnd();
 	}
 }
 
@@ -504,6 +549,8 @@ void updatePlayer() {
 		isShieldActive = false;
 		isVulnerable = true;
 		vulnerableTimer = shieldEffectDuration;
+		showShieldMessage = true;
+		shieldMessageTimer = shieldMessageDuration;
 	}
 
 	if (isColorChanged) {
@@ -520,6 +567,18 @@ void updatePlayer() {
 		vulnerableTimer--;
 		if (vulnerableTimer <= 0) {
 			isVulnerable = false;
+		}
+	}
+	if (showPotionMessage && potionMessageTimer > 0) {
+		potionMessageTimer--;
+		if (potionMessageTimer == 0) {
+			showPotionMessage = false;
+		}
+	}
+	if (showShieldMessage && shieldMessageTimer > 0) {
+		shieldMessageTimer--;
+		if (shieldMessageTimer == 0) {
+			showShieldMessage = false;
 		}
 	}
 
@@ -663,14 +722,14 @@ void Display() {
 		drawPlayer(playerX, playerY);
 		if (showPotionMessage) {
 			drawText(playerX, playerY + playerHeight + 20, "Potion Collected! Enjoy Colors Change!");
-			potionMessageTimer--;
-			if (potionMessageTimer <= 0) {
-				showPotionMessage = false;
-			}
+		}
+		if (showShieldMessage) {
+			drawText(playerX, playerY + playerHeight + 40, "Shield activated! You are invulnerable.");
 		}
 		renderScore();
 		renderTimer();
 	}
+	glutSwapBuffers();
 	glFlush();
 }
 
